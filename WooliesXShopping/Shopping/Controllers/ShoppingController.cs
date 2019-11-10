@@ -20,14 +20,14 @@ namespace Shopping.Controllers
         }
 
         // GET api/user
-        [HttpPost("user")]
+        [HttpGet("user")]
         public UserInfo GetUserInfo()
         {
             return _shoppingService.GetUserInfo();
         }
 
         // GET api/values/5
-        [HttpPost("sort")]
+        [HttpGet("sort")]
         public async Task<IEnumerable<Product>> GetSortedProducts(string sortOption)
         {
             return await _shoppingService.SortProducts(sortOption);

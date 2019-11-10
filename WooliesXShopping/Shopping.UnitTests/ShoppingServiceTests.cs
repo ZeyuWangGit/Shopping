@@ -387,18 +387,6 @@ namespace Shopping.UnitTests
             {
                 new Product
                 {
-                    Name = "Test Product D",
-                    Price = (decimal) 99.99,
-                    Quantity = 0
-                },
-                new Product
-                {
-                    Name = "Test Product C",
-                    Price = (decimal) 10.99,
-                    Quantity = 0
-                },
-                new Product
-                {
                     Name = "Test Product A",
                     Price = (decimal) 5.0,
                     Quantity = 0
@@ -413,6 +401,18 @@ namespace Shopping.UnitTests
                 {
                     Name = "Test Product F",
                     Price = (decimal) 999999999999.0,
+                    Quantity = 0
+                },
+                new Product
+                {
+                    Name = "Test Product C",
+                    Price = (decimal) 10.99,
+                    Quantity = 0
+                },
+                new Product
+                {
+                    Name = "Test Product D",
+                    Price = (decimal) 99.99,
                     Quantity = 0
                 }
             };

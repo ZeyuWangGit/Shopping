@@ -187,7 +187,7 @@ namespace Shopping.Services
                 var bPop = productPopularity[b.Name];
                 if (aPop > bPop)
                 {
-                    return 1;
+                    return -1;
                 }
 
                 if(aPop == bPop)
@@ -195,7 +195,7 @@ namespace Shopping.Services
                     return 0;
                 }
 
-                return -1;
+                return 1;
             });
 
             return productLists;
