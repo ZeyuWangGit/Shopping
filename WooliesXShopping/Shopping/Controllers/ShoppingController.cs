@@ -26,14 +26,14 @@ namespace Shopping.Controllers
             return _shoppingService.GetUserInfo();
         }
 
-        // GET api/values/5
+        // GET api/sort
         [HttpGet("sort")]
         public async Task<IEnumerable<Product>> GetSortedProducts(string sortOption)
         {
             return await _shoppingService.SortProducts(sortOption);
         }
 
-        // POST api/values
+        // POST api/trolleyTotal
         [HttpPost("trolleyTotal")]
         public async Task<decimal> GetTrolleyTotal([FromBody] Trolley trolley)
         {
