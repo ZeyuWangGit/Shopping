@@ -8,10 +8,8 @@ using Shopping.Models.Trolley;
 
 namespace Shopping.Services
 {
-    public interface IShoppingService
+    public interface ITrolleyService
     {
-        UserInfo GetUserInfo();
-        Task<IEnumerable<Product>> SortProducts(ProductSortOption sortOption);
         Task<decimal> CalculateTrolleyTotal(Trolley trolley);
         decimal CalculateTrolley(Trolley trolley);
     }

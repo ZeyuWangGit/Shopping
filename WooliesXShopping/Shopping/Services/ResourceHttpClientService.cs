@@ -12,17 +12,17 @@ using Shopping.Models.Trolley;
 
 namespace Shopping.Services
 {
-    public class ShoppingResourceService : IShoppingResourceService
+    public class ResourceHttpClientService : IResourceHttpClientService
     {
         private readonly Resource _resource;
         private readonly IHttpClientFactory _clientFactory;
-        private readonly ILogger<ShoppingResourceService> _logger;
+        private readonly ILogger<ResourceHttpClientService> _logger;
 
         public const string TrolleyCalculatorResourceApi = "{0}/trolleyCalculator?token={1}";
         public const string ProductListApi = "{0}/products?token={1}";
         public const string ShoppingHistoryApi = "{0}/shopperHistory?token={1}";
 
-        public ShoppingResourceService(IOptions<Resource> resourceOptions, IHttpClientFactory clientFactory, ILogger<ShoppingResourceService> logger)
+        public ResourceHttpClientService(IOptions<Resource> resourceOptions, IHttpClientFactory clientFactory, ILogger<ResourceHttpClientService> logger)
         {
             _resource = resourceOptions.Value;
             _clientFactory = clientFactory;
@@ -74,7 +74,7 @@ namespace Shopping.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error in ResourceHttpClient url {url} jsonContent {jsonContent}");
+                _logger.LogError(ex, $"Error in ResourceHttpClient with url {url} and jsonContent {jsonContent}");
                 throw;
             }
         }

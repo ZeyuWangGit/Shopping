@@ -14,13 +14,12 @@ using Shouldly;
 namespace Shopping.UnitTests
 {
     [TestClass]
-    public class ShoppingServiceTests
+    public class ProductServiceTests
     {
-        private readonly Mock<IOptions<Resource>> _resource = new Mock<IOptions<Resource>>();
-        private readonly Mock<IShoppingResourceService> _shoppingResourceService = new Mock<IShoppingResourceService>();
-        private IShoppingService _mockShoppingService;
+        private readonly Mock<IResourceHttpClientService> _shoppingResourceService = new Mock<IResourceHttpClientService>();
+        private IProductService _mockProductService;
 
-        public ShoppingServiceTests()
+        public ProductServiceTests()
         {
             _shoppingResourceService.Setup(t => t.GetProducts())
                 .ReturnsAsync(new List<Product>
@@ -155,36 +154,12 @@ namespace Shopping.UnitTests
                         }
                     }
                 });
-
-            _resource.Setup(t => t.Value).Returns(new Resource
-            {
-                Name = "TestName",
-                ResourceUrl = "testUrl",
-                Token = "TestToken"
-            });
         }
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _mockShoppingService = new ShoppingService(_resource.Object, _shoppingResourceService.Object);
-        }
-
-        [TestMethod]
-        public void GetUserInfo_ShouldReturnCorrectUserInfo()
-        {
-            // Arrange
-            var expected = new UserInfo
-            {
-                Name = "TestName",
-                Token = "TestToken"
-            };
-
-            var actual = _mockShoppingService.GetUserInfo();
-
-            // Assert
-            actual.Name.ShouldBe(expected.Name);
-            actual.Token.ShouldBe(expected.Token);
+            _mockProductService = new ProductService(_shoppingResourceService.Object);
         }
 
         [TestMethod]
@@ -225,7 +200,7 @@ namespace Shopping.UnitTests
                 }
             };
 
-            var actual = _mockShoppingService.SortProducts(ProductSortOption.Low).Result;
+            var actual = _mockProductService.SortProducts(ProductSortOption.Low).Result;
             
             // Act
             var expectedJson = JsonConvert.SerializeObject(expected);
@@ -274,7 +249,7 @@ namespace Shopping.UnitTests
 
             };
 
-            var actual = _mockShoppingService.SortProducts(ProductSortOption.High).Result;
+            var actual = _mockProductService.SortProducts(ProductSortOption.High).Result;
 
             // Act
             var expectedJson = JsonConvert.SerializeObject(expected);
@@ -322,7 +297,7 @@ namespace Shopping.UnitTests
                 }
             };
 
-            var actual = _mockShoppingService.SortProducts(ProductSortOption.Ascending).Result;
+            var actual = _mockProductService.SortProducts(ProductSortOption.Ascending).Result;
 
             // Act
             var expectedJson = JsonConvert.SerializeObject(expected);
@@ -370,7 +345,7 @@ namespace Shopping.UnitTests
                 }
             };
 
-            var actual = _mockShoppingService.SortProducts(ProductSortOption.Descending).Result;
+            var actual = _mockProductService.SortProducts(ProductSortOption.Descending).Result;
 
             // Act
             var expectedJson = JsonConvert.SerializeObject(expected);
@@ -418,7 +393,7 @@ namespace Shopping.UnitTests
                 }
             };
 
-            var actual = _mockShoppingService.SortProducts(ProductSortOption.Recommended).Result;
+            var actual = _mockProductService.SortProducts(ProductSortOption.Recommended).Result;
 
             // Act
             var expectedJson = JsonConvert.SerializeObject(expected);
@@ -426,45 +401,6 @@ namespace Shopping.UnitTests
 
             // Assert
             actualJson.ShouldBe(expectedJson);
-        }
-
-        [TestMethod]
-        public void CalculateTrolley_ShouldReturnCorrectTotal()
-        {
-            // Arrange
-            var trolley = new Trolley
-            {
-                Products = new List<TrolleyProduct>
-                {
-                    new TrolleyProduct {Name = "string", Price = 5},
-                    new TrolleyProduct {Name = "A", Price = 10}
-                },
-                Quantities = new List<ProductQuantity>
-                {
-                    new ProductQuantity { Name = "string", Quantity = 5 },
-                    new ProductQuantity { Name = "A", Quantity = 3 }
-                }, 
-                Specials = new List<Special>
-                {
-                    new Special
-                    {
-                        Quantities = new List<ProductQuantity>
-                        {
-                            new ProductQuantity{ Name = "string", Quantity = 3},
-                            new ProductQuantity{ Name = "A", Quantity = 3},
-                        },
-                        Total = 20
-                    }
-                }
-            };
-
-            // Act
-            decimal expected = 30;
-            var actual = _mockShoppingService.CalculateTrolley(trolley);
-
-            // Assert
-            actual.ShouldBe(expected);
-
         }
     }
 }

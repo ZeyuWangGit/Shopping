@@ -7,7 +7,7 @@ using Shopping.Models.Trolley;
 
 namespace Shopping.Services
 {
-    public interface IShoppingResourceService
+    public interface IResourceHttpClientService
     {
         Task<decimal> CalculateTrolleyViaApi(Trolley trolley);
         Task<IEnumerable<Product>> GetProducts();

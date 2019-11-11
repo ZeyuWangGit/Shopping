@@ -11,8 +11,11 @@ namespace Shopping
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<ShoppingService>().As<IShoppingService>();
-            builder.RegisterType<ShoppingResourceService>().As<IShoppingResourceService>();
+            builder.RegisterType<TrolleyService>().As<ITrolleyService>();
+            builder.RegisterType<ResourceHttpClientService>().As<IResourceHttpClientService>();
+            builder.RegisterType<UserService>().As<IUserService>();
+            builder.RegisterType<ProductService>().As<IProductService>();
+
         }
     }
 }
