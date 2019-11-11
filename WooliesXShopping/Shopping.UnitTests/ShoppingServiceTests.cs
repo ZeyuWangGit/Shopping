@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Newtonsoft.Json;
+using Shopping.Common;
 using Shopping.Models;
 using Shopping.Models.Trolley;
 using Shopping.Services;
@@ -15,8 +16,8 @@ namespace Shopping.UnitTests
     [TestClass]
     public class ShoppingServiceTests
     {
-        private Mock<IOptions<Resource>> _resource = new Mock<IOptions<Resource>>();
-        private Mock<IShoppingResourceService> _shoppingResourceService = new Mock<IShoppingResourceService>();
+        private readonly Mock<IOptions<Resource>> _resource = new Mock<IOptions<Resource>>();
+        private readonly Mock<IShoppingResourceService> _shoppingResourceService = new Mock<IShoppingResourceService>();
         private IShoppingService _mockShoppingService;
 
         public ShoppingServiceTests()
@@ -224,7 +225,7 @@ namespace Shopping.UnitTests
                 }
             };
 
-            var actual = _mockShoppingService.SortProducts("Low").Result;
+            var actual = _mockShoppingService.SortProducts(ProductSortOption.Low).Result;
             
             // Act
             var expectedJson = JsonConvert.SerializeObject(expected);
@@ -273,7 +274,7 @@ namespace Shopping.UnitTests
 
             };
 
-            var actual = _mockShoppingService.SortProducts("High").Result;
+            var actual = _mockShoppingService.SortProducts(ProductSortOption.High).Result;
 
             // Act
             var expectedJson = JsonConvert.SerializeObject(expected);
@@ -321,7 +322,7 @@ namespace Shopping.UnitTests
                 }
             };
 
-            var actual = _mockShoppingService.SortProducts("Ascending").Result;
+            var actual = _mockShoppingService.SortProducts(ProductSortOption.Ascending).Result;
 
             // Act
             var expectedJson = JsonConvert.SerializeObject(expected);
@@ -369,7 +370,7 @@ namespace Shopping.UnitTests
                 }
             };
 
-            var actual = _mockShoppingService.SortProducts("Descending").Result;
+            var actual = _mockShoppingService.SortProducts(ProductSortOption.Descending).Result;
 
             // Act
             var expectedJson = JsonConvert.SerializeObject(expected);
@@ -417,7 +418,7 @@ namespace Shopping.UnitTests
                 }
             };
 
-            var actual = _mockShoppingService.SortProducts("Recommended").Result;
+            var actual = _mockShoppingService.SortProducts(ProductSortOption.Recommended).Result;
 
             // Act
             var expectedJson = JsonConvert.SerializeObject(expected);

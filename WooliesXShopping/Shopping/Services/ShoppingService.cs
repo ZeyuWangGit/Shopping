@@ -1,9 +1,11 @@
-﻿using Microsoft.Extensions.Options;
+﻿using System;
+using Microsoft.Extensions.Options;
 using Shopping.Models;
 using Shopping.Models.Trolley;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Shopping.Common;
 
 namespace Shopping.Services
 {
@@ -28,36 +30,25 @@ namespace Shopping.Services
             };
         }
 
-        public async Task<IEnumerable<Product>> SortProducts(string sortOption)
+        public async Task<IEnumerable<Product>> SortProducts(ProductSortOption sortOption)
         {
             var products = await _shoppingResourceService.GetProducts();
 
-            if (sortOption == "Low")
+            switch (sortOption)
             {
-                return SortProductsByLowPrice(products.ToList());
+                case ProductSortOption.Low:
+                    return SortProductsByLowPrice(products.ToList());
+                case ProductSortOption.High:
+                    return SortProductsByHighPrice(products.ToList());
+                case ProductSortOption.Ascending:
+                    return SortProductsByAscendingName(products.ToList());
+                case ProductSortOption.Descending:
+                    return SortProductsByDescendingName(products.ToList());
+                case ProductSortOption.Recommended:
+                    return await SortProductsByRecommended(products.ToList());
+                default:
+                    return products.ToList();
             }
-
-            if (sortOption == "High")
-            {
-                return SortProductsByHighPrice(products.ToList());
-            }
-
-            if (sortOption == "Ascending")
-            {
-                return SortProductsByAscendingName(products.ToList());
-            }
-
-            if (sortOption == "Descending")
-            {
-                return SortProductsByDescendingName(products.ToList());
-            }
-
-            if (sortOption == "Recommended")
-            {
-                return await SortProductsByRecommended(products.ToList());
-            }
-
-            return products.ToList();
         }
 
         public async Task<decimal> CalculateTrolleyTotal(Trolley trolley)
@@ -156,24 +147,24 @@ namespace Shopping.Services
             return productsPopularity;
         }
 
-        private IEnumerable<Product> SortProductsByLowPrice(IEnumerable<Product> products)
+        private static IEnumerable<Product> SortProductsByLowPrice(IEnumerable<Product> products)
         {
             return products.OrderBy(o => o.Price).ToList();
         }
 
-        private IEnumerable<Product> SortProductsByHighPrice(IEnumerable<Product> products)
+        private static IEnumerable<Product> SortProductsByHighPrice(IEnumerable<Product> products)
         {
             return products.OrderByDescending(o => o.Price).ToList();
         }
 
-        private IEnumerable<Product> SortProductsByAscendingName(IEnumerable<Product> products)
+        private static IEnumerable<Product> SortProductsByAscendingName(IEnumerable<Product> products)
         {
-            return products.OrderBy(o => o.Name).ToList();
+            return products.OrderBy(o => o.Name, StringComparer.OrdinalIgnoreCase).ToList();
         }
 
-        private IEnumerable<Product> SortProductsByDescendingName(IEnumerable<Product> products)
+        private static IEnumerable<Product> SortProductsByDescendingName(IEnumerable<Product> products)
         {
-            return products.OrderByDescending(o => o.Name).ToList();
+            return products.OrderByDescending(o => o.Name, StringComparer.OrdinalIgnoreCase).ToList();
         }
 
         private async Task<IEnumerable<Product>> SortProductsByRecommended(IEnumerable<Product> products)

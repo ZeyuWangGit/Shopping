@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Shopping.Models;
@@ -15,70 +16,67 @@ namespace Shopping.Services
     {
         private readonly Resource _resource;
         private readonly IHttpClientFactory _clientFactory;
+        private readonly ILogger<ShoppingResourceService> _logger;
 
-        public ShoppingResourceService(IOptions<Resource> resourceOptions, IHttpClientFactory clientFactory)
+        public const string TrolleyCalculatorResourceApi = "{0}/trolleyCalculator?token={1}";
+        public const string ProductListApi = "{0}/products?token={1}";
+        public const string ShoppingHistoryApi = "{0}/shopperHistory?token={1}";
+
+        public ShoppingResourceService(IOptions<Resource> resourceOptions, IHttpClientFactory clientFactory, ILogger<ShoppingResourceService> logger)
         {
             _resource = resourceOptions.Value;
             _clientFactory = clientFactory;
+            _logger = logger;
         }
 
         public async Task<decimal> CalculateTrolleyViaApi(Trolley trolley)
         {
-            var trolleyCalculatorUrl = $"{_resource.ResourceUrl}/trolleyCalculator?token={_resource.Token}";
+            var trolleyCalculatorUrl = string.Format(TrolleyCalculatorResourceApi, _resource.ResourceUrl, _resource.Token);
 
-            var request = new HttpRequestMessage(HttpMethod.Post, trolleyCalculatorUrl)
-            {
-                Content = new StringContent(JsonConvert.SerializeObject(trolley), Encoding.UTF8, "application/json")
-            };
-
-
-            var client = _clientFactory.CreateClient();
-
-            var response = await client.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<decimal>(result);
-            }
-
-            return 0;
+            return await ResourceHttpClient<decimal>(HttpMethod.Post, trolleyCalculatorUrl, JsonConvert.SerializeObject(trolley));
         }
+
         public async Task<IEnumerable<Product>> GetProducts()
         {
-            var productUrl = $"{_resource.ResourceUrl}/products?token={_resource.Token}";
+            var productUrl = string.Format(ProductListApi, _resource.ResourceUrl, _resource.Token);
 
-            var request = new HttpRequestMessage(HttpMethod.Get, productUrl);
-
-            var client = _clientFactory.CreateClient();
-
-            var response = await client.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<List<Product>>(result);
-            }
-
-            return Array.Empty<Product>();
+            return await ResourceHttpClient<IEnumerable<Product>>(HttpMethod.Get, productUrl);
         }
+
         public async Task<IEnumerable<ShopperHistory>> GetShoppingHistory()
         {
-            var shoppingHistoryUrl = $"{_resource.ResourceUrl}/shopperHistory?token={_resource.Token}";
+            var shoppingHistoryUrl = string.Format(ShoppingHistoryApi, _resource.ResourceUrl, _resource.Token);
 
-            var request = new HttpRequestMessage(HttpMethod.Get, shoppingHistoryUrl);
+            return await ResourceHttpClient<IEnumerable<ShopperHistory>>(HttpMethod.Get, shoppingHistoryUrl);
+        }
 
-            var client = _clientFactory.CreateClient();
-
-            var response = await client.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
+        private async Task<T> ResourceHttpClient<T>(HttpMethod httpMethod, string url, string jsonContent = "")
+        {
+            try
             {
-                var result = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<IEnumerable<ShopperHistory>>(result);
-            }
+                using (var request = new HttpRequestMessage(httpMethod, url))
+                {
+                    using (var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json"))
+                    {
+                        request.Content = stringContent;
 
-            return Array.Empty<ShopperHistory>();
+                        using (var client = _clientFactory.CreateClient())
+                        {
+                            using (var response = await client.SendAsync(request))
+                            {
+                                response.EnsureSuccessStatusCode();
+                                var result = await response.Content.ReadAsStringAsync();
+                                return JsonConvert.DeserializeObject<T>(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in ResourceHttpClient url {url} jsonContent {jsonContent}");
+                throw;
+            }
         }
     }
 }
