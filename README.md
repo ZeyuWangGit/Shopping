@@ -1,5 +1,3 @@
-# Shopping
-
-WooliesX Coding Practices:
+# WooliesX Coding Practices:
 
 Link for checking https://shoppingwooliesxzeyuwang.azurewebsites.net/api
