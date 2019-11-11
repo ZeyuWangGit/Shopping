@@ -26,11 +26,11 @@ namespace Shopping.Controllers
         [HttpGet("sort")]
         public async Task<ActionResult<IEnumerable<Product>>> GetSortedProducts(string sortOption)
         {
-            _logger.LogTrace($"api/sort catch with sortOption {sortOption}");
+            _logger.LogTrace($"api/sort has been called with sortOption {sortOption}");
 
             if (string.IsNullOrWhiteSpace(sortOption) || !ModelState.IsValid)
             {
-                return BadRequest("Required Query SortOptions Is Not Provided");
+                return BadRequest("Required Query SortOptions Is Not Provided Or Valid");
             }
 
             Enum.TryParse(sortOption, out ProductSortOption productSortOption);

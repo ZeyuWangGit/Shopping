@@ -26,11 +26,11 @@ namespace Shopping.Controllers
         [HttpGet("user")]
         public ActionResult<UserInfo> GetUserInfo()
         {
-            _logger.LogInformation("api/user has been called...");
+            _logger.LogInformation("api/user has been called");
 
             var response = _userService.GetUserInfo();
 
-            _logger.LogInformation($"api/user response {response.Name} {response.Token}");
+            _logger.LogInformation($"api/user response with {response.Name} and {response.Token}");
 
             return response;
         }

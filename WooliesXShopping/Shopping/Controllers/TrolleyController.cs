@@ -24,7 +24,7 @@ namespace Shopping.Controllers
         [HttpPost("trolleyTotal")]
         public async Task<ActionResult<decimal>> GetTrolleyTotal([FromBody] Trolley trolley)
         {
-            _logger.LogTrace($"api/trolleyTotal has been called...");
+            _logger.LogTrace($"api/trolleyTotal has been called");
 
             if (!ModelState.IsValid)
             {
@@ -36,7 +36,7 @@ namespace Shopping.Controllers
             var result = _trolleyService.CalculateTrolley(trolley);
             //var result = await _trolleyService.CalculateTrolleyTotalViaApi(trolley);
 
-            _logger.LogTrace($"api/trolleyTotal has been executed");
+            _logger.LogTrace($"api/trolleyTotal response with {result}");
 
             return Ok(result);
         }
