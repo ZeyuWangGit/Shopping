@@ -1,11 +1,8 @@
-﻿using System;
-using Microsoft.Extensions.Options;
-using Shopping.Models;
+﻿using Shopping.Models;
 using Shopping.Models.Trolley;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Shopping.Common;
 
 namespace Shopping.Services
 {
@@ -18,15 +15,26 @@ namespace Shopping.Services
             _resourceHttpClientService = resourceHttpClientService;
         }
 
-        public async Task<decimal> CalculateTrolleyTotal(Trolley trolley)
+        public async Task<decimal> CalculateTrolleyTotalViaApi(Trolley trolley)
         {
             return await _resourceHttpClientService.CalculateTrolleyViaApi(trolley);
         }
 
         public decimal CalculateTrolley(Trolley trolley)
         {
+            var prices = new List<decimal> {ApplySpecial(trolley.Specials, GetProductsList(trolley))};
+            for (var i = 1; i < trolley.Specials.Count; i++)
+            {
+                var rotateList = trolley.Specials.Skip(1).Concat(trolley.Specials.Take(1));
+                prices.Add(ApplySpecial(rotateList, GetProductsList(trolley)));
+            }
+            prices.Sort();
+            return prices.FirstOrDefault();
+        }
+
+        private Dictionary<string, Product> GetProductsList(Trolley trolley)
+        {
             var products = new Dictionary<string, Product>();
-            decimal totalPrice = 0;
             foreach (var product in trolley.Products)
             {
                 products.Add(product.Name, new Product
@@ -45,14 +53,20 @@ namespace Shopping.Services
                 }
             }
 
-            foreach (var special in trolley.Specials)
+            return products;
+        }
+
+        private decimal ApplySpecial(IEnumerable<Special> specials, Dictionary<string, Product> products)
+        {
+            decimal totalPrice = 0;
+            foreach (var special in specials)
             {
                 var satisfiedTime = int.MaxValue;
                 foreach (var items in special.Quantities)
                 {
-                    if (products.TryGetValue(items.Name, out var specialProd))
+                    if (products.TryGetValue(items.Name, out var specialProd) && items.Quantity > 0)
                     {
-                        var time = (int) (specialProd.Quantity / items.Quantity);
+                        var time = (int)(specialProd.Quantity / items.Quantity);
                         if (time <= satisfiedTime)
                         {
                             satisfiedTime = time;
@@ -73,15 +87,17 @@ namespace Shopping.Services
                     satisfiedTime = 0;
                 }
                 totalPrice += satisfiedTime * special.Total;
+
             }
 
-            foreach (KeyValuePair<string, Product> entry in products)
+            foreach (var (_, value) in products)
             {
-                totalPrice += entry.Value.Price * entry.Value.Quantity;
+                totalPrice += value.Price * value.Quantity;
             }
 
             return totalPrice;
         }
+
     }
 
 }

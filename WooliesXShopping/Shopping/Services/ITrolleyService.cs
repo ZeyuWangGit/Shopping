@@ -10,7 +10,7 @@ namespace Shopping.Services
 {
     public interface ITrolleyService
     {
-        Task<decimal> CalculateTrolleyTotal(Trolley trolley);
+        Task<decimal> CalculateTrolleyTotalViaApi(Trolley trolley);
         decimal CalculateTrolley(Trolley trolley);
     }
 }

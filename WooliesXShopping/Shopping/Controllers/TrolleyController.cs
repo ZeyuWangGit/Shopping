@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Shopping.Models.Trolley;
 using Shopping.Services;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Shopping.Controllers
 {
@@ -30,7 +31,10 @@ namespace Shopping.Controllers
                 return BadRequest("Trolley Data Is Not Valid");
             }
 
-            var result = await _trolleyService.CalculateTrolleyTotal(trolley);
+            _logger.LogInformation($"try to calculate {JsonConvert.SerializeObject(trolley)}");
+
+            var result = _trolleyService.CalculateTrolley(trolley);
+            //var result = await _trolleyService.CalculateTrolleyTotalViaApi(trolley);
 
             _logger.LogTrace($"api/trolleyTotal has been executed");
 
